@@ -1,0 +1,880 @@
+import tkinter as tk
+from tkinter import*
+from PIL import Image, ImageTk
+import pymysql
+from tkinter import messagebox
+import re
+from tkinter import ttk
+from tkinter import Scrollbar
+import webbrowser
+
+
+
+top=tk.Tk()
+top.title("Amazon prime video")
+top.geometry("800x600")
+top.config(bg= 'black')
+
+
+##fourth page
+
+def register():
+    connection = pymysql.connect(
+        host="localhost",
+        user="root",
+        password="1234",
+        database="school"
+        )
+    cursor=connection.cursor()
+    global user,Pass,cpass,Mob_num
+
+    user=ebb1.get()
+    Mob_num=ebb2.get()
+    Pass=ebb3.get()
+    cpass=ebb4.get()
+
+    cursor.execute("SELECT * FROM details WHERE Mobile_num = %s",(Mob_num))
+    if cursor.fetchone():
+        messagebox.showinfo("Success", "Candidate is already registered!.")
+        ebb1.get().delete(0,END)
+        ebb2.get().delete(0,END)
+        data_store()
+    else:
+        if(cpass!=Pass):
+            messagebox.showinfo("Error","password mismatched!")
+            ebb3.get().delete(0,END)
+            ebb4.get().delete(0,END)
+            data_store()
+         
+        elif not user or not Mob_num or not Pass or not cpass:
+            messagebox.showinfo("Error", "Please enter all fields!")
+            ebb1.get().delete(0,END)
+            ebb2.get().delete(0,END)
+            ebb3.get().delete(0,END)
+            ebb4.get().delete(0,END)
+            data_store()
+        
+        elif(Mob_num.isdigit() and len(Mob_num) == 10):
+            messagebox.showinfo("Validation Result", "Valid Mobile Number!")
+
+        else:
+            messagebox.showinfo("Error","Mobile num must be allowed only 10 numbers not character")
+            ebb2.get().delete(0,END)
+            data_store()
+        if (len(Pass) >= 8 and
+            re.search(r"[A-Z]", Pass) and
+            re.search(r"[a-z]", Pass) and
+            re.search(r"[!@#$%^&*(),.?\":{}|<>]", Pass)):
+            messagebox.showinfo("Success","Password is valid!..")
+        else:
+            messagebox.showinfo("Error","Password must be atleast 8 characters,symbols and numbers!")
+            ebb3.get().delete(0,END)
+            data_store()
+        cursor.execute("INSERT INTO details (Name,Mobile_num,password,cpassword) VALUES (%s, %s, %s, %s)", (user,Mob_num,Pass,cpass)),
+        connection.commit(),
+        messagebox.showinfo("Success","Registeration successfully!")
+        page3.destroy()
+    cursor.close()
+    connection.close()
+##
+####
+#####fourth page
+
+##
+def fourth():
+##
+    global ebb1,ebb2,ebb3,ebb4,page4
+    
+    page4=Frame(page3,bg='black',height=1000,width=600)
+    page4.pack(fill=X)
+
+    lab1=Label(page4,text="Create New account",
+               font=('Fira Sans', 15, 'bold'),fg="#00A8E1",bg='black')
+    lab1.place(x=1030,y=70)
+
+    lb2=Label(page4,text="Username ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    lb2.place(x=995,y=160)
+
+    ebb1=Entry(page4,font=('century gothic', 15, 'bold'))
+    ebb1.place(x=995,y=200,width=300)
+
+
+    lb3=Label(page4,text="Mobile number ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    lb3.place(x=995,y=260)
+
+    ebb2=Entry(page4,font=('century gothic', 15, 'bold'))
+    ebb2.place(x=995,y=290,width=300)
+
+    lb4=Label(page4,text="Password ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    lb4.place(x=995,y=370)
+
+    ebb3=Entry(page4,show='*',font=('century gothic', 15, 'bold'))
+    ebb3.place(x=995,y=400,width=300)
+
+    lb5=Label(page4,text="Confirm Password ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    lb5.place(x=995,y=480)
+
+    ebb4=Entry(page4,show='*',font=('century gothic', 15, 'bold'))
+    ebb4.place(x=995,y=520,width=300)
+
+    b1 = Button(page4,text='save',command=lambda:(register(),third()),bg="#00A8E1",fg="white",
+            font=("Consolas", 13, "bold"),height="1",width="13",bd=0)
+    b1.place(x=1070, y=590)
+
+    img=Image.open("prime video1.jpg")
+    img=img.resize((800,950))
+    img2=ImageTk.PhotoImage(img)
+    imglabel=Button(page4,image=img2,bg="black",bd=0)
+    imglabel.image=img2
+    imglabel.place(x=0,y=0)
+
+
+
+
+def validate_login():
+    global entered_username,entered_mobnum,entered_password
+    entered_username = eb1.get()
+    entered_Mobnum = eb2.get()
+    entered_password=eb3.get()
+   
+    connection = pymysql.connect(
+        host="localhost",
+        user="root",
+        password="1234",
+        database="school"
+      )
+    cursor=connection.cursor()
+    cursor.execute("SELECT * FROM details WHERE Name = %s AND Mobile_num = %s AND cpassword = %s" ,(entered_username,entered_Mobnum,entered_password)),
+    if cursor.fetchone():
+        messagebox.showinfo("Success", "Login successfully!")
+        fifth()
+    else:
+        messagebox.showinfo("Error", "Invalid details!")
+        eb1.get().delete(0,END)
+        eb2.get().delete(0,END)
+        eb3.get().delete(0,END)
+        second()
+    cursor.close()
+    connection.close()
+
+
+
+
+
+
+
+
+
+
+def fifth():
+    global new_page, buttont2
+
+    main_frame = tk.Frame(top, bg='white', width=1600, height=800)
+    main_frame.place(x=0, y=0)
+# Create a canvas
+    canvas = tk.Canvas(main_frame, bg='black', width=1600, height=800)
+    canvas.place(x=10, y=10)
+
+# Add a scrollbar to the canvas
+    scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+    scrollbar.place(x=1520, y=10, height=800)
+
+# Configure the canvas with the scrollbar
+    canvas.configure(yscrollcommand=scrollbar.set)
+    canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+# Create a frame inside the canvas (scrollable frame)
+    scrollable_frame = tk.Frame(canvas, bg='black', width=1600, height=1100)
+    scrollable_frame.place(x=0, y=0)
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+   
+    # Create a new page inside the scrollable frame with specific elements
+    new_page = tk.Frame(scrollable_frame, bg='black', height=1000, width=1515)
+    new_page.pack(fill=tk.BOTH, pady=10)
+
+    img=Image.open("C:\\Users\\hp\\Documents\\Python Assignment\\Prime.jpeg")
+    img=img.resize((390,100))
+    img2=ImageTk.PhotoImage(img)
+    imglabel=Label(new_page,image=img2,bg="black",bd=0)
+    imglabel.image=img2
+    imglabel.place(x=1100,y=20)
+
+    buttont1=tk.Button( new_page,text="Home",fg="#00A8E1",bg='black',font=("sans serif", 15, "bold"),bd=0)
+    buttont1.place(x=30,y=30)
+
+    buttont2=tk.Button( new_page,text="Movies",command='sixth',fg="#00A8E1",bg='black',font=("sans serif", 15, "bold"),bd=0)
+    buttont2.place(x=140,y=30)
+
+    buttont3=tk.Button( new_page,text="TV Shows",fg="#00A8E1",bg='black',font=("sans serif", 15, "bold"),bd=0)
+    buttont3.place(x=240,y=30)
+
+    buttont4=tk.Button( new_page,text="Web series",fg="#00A8E1",bg='black',font=("sans serif", 15, "bold"),bd=0)
+    buttont4.place(x=380,y=30)
+
+    buttont5=tk.Button( new_page,text="Subscriptions",fg="#00A8E1",bg='black',font=("sans serif", 15, "bold"),bd=0)
+    buttont5.place(x=540,y=30)
+
+
+    def display_movies_page():
+        for widget in scrollable_frame.winfo_children():
+            widget.destroy()
+
+    # Create a new page for the Movies
+        movies_page = tk.Frame(scrollable_frame, bg='black', height=1000, width=1515)
+        movies_page.pack(fill=tk.BOTH, pady=10)
+
+    # Add a label or content for the Movies page
+        movies_label = tk.Label(movies_page, text="Recommended   Movies", fg="#00A8E1", bg="black", font=("sans serif", 24, "bold"))
+        movies_label.place(x=100, y=50)
+
+        movies_label = tk.Label(movies_page, text="Action movies", fg="white", bg="black", font=("sans serif", 20, "bold"))
+        movies_label.place(x=100, y=200)
+
+        def call():
+            webbrowser.open("https://www.youtube.com/watch?v=jxCRlebiebw") 
+        img=Image.open('goatt.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call,borderwidth=0)
+        butn1.place(x=100,y=280)
+
+        def call1():
+            webbrowser.open("https://www.youtube.com/watch?v=B2yC1jpAYvQ") 
+
+        img=Image.open('garudan.webp')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call1,borderwidth=0)
+        butn1.place(x=450,y=280)
+        
+        def call2():
+            webbrowser.open("https://www.youtube.com/watch?v=ajnCMSC4VPo") 
+        img=Image.open('kanguva.webp')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call2,borderwidth=0)
+        butn1.place(x=800,y=280)
+
+        def call3():
+            webbrowser.open("https://www.youtube.com/watch?v=vmSJB-2pvGQ") 
+        img=Image.open('vida muyarcgi.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call3,borderwidth=0)
+        butn1.place(x=1150,y=280)
+
+        movies_labe2 = tk.Label(movies_page, text="Blockbuster movies", fg="white", bg="black", font=("sans serif", 20, "bold"))
+        movies_labe2.place(x=100, y=570)
+
+        def call4():
+            webbrowser.open("https://www.youtube.com/watch?v=WyzSDlLc-XQ") 
+        img=Image.open('raghu thatha.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call4,borderwidth=0)
+        butn1.place(x=100,y=650)
+
+        def call5():
+            webbrowser.open("https://www.youtube.com/watch?v=X6srnSdOJU8") 
+        img=Image.open('Rathnam.webp')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call5,borderwidth=0)
+        butn1.place(x=450,y=650)
+
+        def call6():
+            webbrowser.open("https://www.youtube.com/watch?v=qQJJWhh-XRo") 
+        img=Image.open('Rayan movie.jpeg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call6,borderwidth=0)
+        butn1.place(x=800,y=650)
+
+        def call7():
+            webbrowser.open("https://www.youtube.com/watch?v=ATmYzgRQphU") 
+        img=Image.open('siran.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( movies_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( movies_page,image=img2,command=call7,borderwidth=0)
+        butn1.place(x=1150,y=650)
+
+# Add a back button to return to the home page
+        back_button = tk.Button(movies_page, text="Back to Home", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0, command=lambda: display_home_page())
+        back_button.place(x=1200, y=50)
+
+    def display_Web_series_page():
+        for widget in scrollable_frame.winfo_children():
+            widget.destroy()
+
+    # Create a new page for the Movies
+        series_page = tk.Frame(scrollable_frame, bg='black', height=1000, width=1515)
+        series_page.pack(fill=tk.BOTH, pady=10)
+
+    # Add a label or content for the Movies page
+        series_label = tk.Label(series_page, text="Recommended   Web series", fg="#00A8E1", bg="black", font=("sans serif", 24, "bold"))
+        series_label.place(x=100, y=50)
+
+        series_label = tk.Label(series_page, text="Thriller series", fg="white", bg="black", font=("sans serif", 20, "bold"))
+        series_label.place(x=100, y=200)
+
+        def call8():
+            webbrowser.open("https://www.youtube.com/watch?v=Dt6mUF-WW_A") 
+        img=Image.open('november story thriller.jpeg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button(  series_page,image=img2,command=call8,borderwidth=0)
+        butn1.place(x=100,y=280)
+
+        def call9():
+            webbrowser.open("https://www.youtube.com/watch?v=yfc2We40QOk") 
+
+        img=Image.open('murder thriller.webp')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button(  series_page,image=img2,command=call9,borderwidth=0)
+        butn1.place(x=450,y=280)
+        
+
+        def call10():
+            webbrowser.open("https://www.youtube.com/watch?v=-0d7TVQ-SpM") 
+        img=Image.open('mithya triller.jpeg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button(  series_page,image=img2,command=call10,borderwidth=0)
+        butn1.place(x=800,y=280)
+
+        def call11():
+            webbrowser.open("https://www.youtube.com/watch?v=JRKhuiI7Y_Q")
+        img=Image.open('Brinda.jpeg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button(  series_page,image=img2,command=call11,borderwidth=0)
+        butn1.place(x=1150,y=280)
+
+        series_label2 = tk.Label(series_page, text="Bloackbuster series", fg="white", bg="black", font=("sans serif", 20, "bold"))
+        series_label2.place(x=100, y=570)
+
+        def call12():
+            webbrowser.open("https://www.youtube.com/watch?v=nt5X-VpUFis") 
+        img=Image.open('vera mari blockbuster.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( series_page,image=img2,command=call12,borderwidth=0)
+        butn1.place(x=100,y=650)
+
+        def call13():
+            webbrowser.open("https://www.youtube.com/watch?v=02Hj6VNYJ88") 
+        img=Image.open('Thalaimai blockbuster.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( series_page,image=img2,command=call13,borderwidth=0)
+        butn1.place(x=450,y=650)
+
+        def call14():
+            webbrowser.open("https://www.youtube.com/watch?v=OXky684U1uo") 
+        img=Image.open('bench life.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( series_page,image=img2,command=call14,borderwidth=0)
+        butn1.place(x=800,y=650)
+
+        def call15():
+            webbrowser.open("https://www.youtube.com/watch?v=YoaIbJw_mxA") 
+        img=Image.open('thalai blockbuster image.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( series_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( series_page,image=img2,command=call15,borderwidth=0)
+        butn1.place(x=1150,y=650)
+
+        back_button = tk.Button( series_page, text="Back to Home", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0, command=lambda: display_home_page())
+        back_button.place(x=1200, y=50)
+
+    def display_TVShows_page():
+        for widget in scrollable_frame.winfo_children():
+            widget.destroy()
+
+    # Create a new page for the Movies
+        TVShows_page = tk.Frame(scrollable_frame, bg='black', height=1000, width=1515)
+        TVShows_page .pack(fill=tk.BOTH, pady=10)
+
+    # Add a label or content for the Movies page
+        TVShows_label = tk.Label(TVShows_page , text="Recommended   TVShows", fg="#00A8E1", bg="black", font=("sans serif", 24, "bold"))
+        TVShows_label.place(x=100, y=50)
+
+        TVShows_label = tk.Label(TVShows_page, text="Mystery and thriller shows", fg="white", bg="black", font=("sans serif", 20, "bold"))
+        TVShows_label.place(x=100, y=200)
+
+        def call16():
+            webbrowser.open("https://www.youtube.com/watch?v=nxE-k2MLQIA") 
+        img=Image.open('breath into the shadow.jpeg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button(  TVShows_page,image=img2,command=call16,borderwidth=0)
+        butn1.place(x=100,y=280)
+
+        def call17():
+            webbrowser.open("https://www.youtube.com/watch?v=4CKU89MI0_0") 
+
+        img=Image.open('Inspector tv thriller.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call17,borderwidth=0)
+        butn1.place(x=450,y=280)
+        
+
+        def call18():
+            webbrowser.open("https://www.youtube.com/watch?v=jOctqKM5dW4") 
+        img=Image.open('mumbai dairies.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call18,borderwidth=0)
+        butn1.place(x=800,y=280)
+
+        def call19():
+            webbrowser.open("https://www.youtube.com/watch?v=-ITBFd_K5_M")
+        img=Image.open('dhootha thriller tv.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label(  TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call19,borderwidth=0)
+        butn1.place(x=1150,y=280)
+
+        TVShows_label2 = tk.Label(TVShows_page, text="Horror TVShows", fg="white", bg="black", font=("sans serif", 20, "bold"))
+        TVShows_label2.place(x=100, y=570)
+
+        def call20():
+            webbrowser.open("https://www.youtube.com/watch?v=_hlkNQL5Ecg") 
+        img=Image.open('super natural horror tv.webp')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call20,borderwidth=0)
+        butn1.place(x=100,y=650)
+
+        def call21():
+            webbrowser.open("https://www.youtube.com/watch?v=GXrDYboUnnw") 
+        img=Image.open('original horror tv.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call21,borderwidth=0)
+        butn1.place(x=450,y=650)
+
+        def call22():
+            webbrowser.open("https://www.youtube.com/watch?v=MreqwusrMjc") 
+        img=Image.open('The viilage.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call22,borderwidth=0)
+        butn1.place(x=800,y=650)
+
+        def call23():
+            webbrowser.open("https://www.youtube.com/watch?v=rIPnNOeQrs4") 
+        img=Image.open('Adhura horror tv.jpg')
+        img=img.resize((300,200))
+        img2=ImageTk.PhotoImage(img)
+        imglabel=Label( TVShows_page,image=img2)
+        imglabel.image=img2
+        butn1=Button( TVShows_page,image=img2,command=call23,borderwidth=0)
+        butn1.place(x=1150,y=650)
+
+        back_button = tk.Button( TVShows_page, text="Back to Home", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0, command=lambda: display_home_page())
+        back_button.place(x=1200, y=50)
+
+
+# Function to display the Home Page (in case you need to return to it)
+    def display_home_page():
+        for widget in scrollable_frame.winfo_children():
+            widget.destroy()
+
+    # Recreate the original new_page content
+        new_page = tk.Frame(scrollable_frame, bg='black', height=1000, width=1515)
+        new_page.pack(fill=tk.BOTH, pady=10)
+
+        img = Image.open("C:\\Users\\hp\\Documents\\Python Assignment\\Prime.jpeg")
+        img = img.resize((390, 100))
+        img2 = ImageTk.PhotoImage(img)
+        imglabel = tk.Label(new_page, image=img2, bg="black", bd=0)
+        imglabel.image = img2
+        imglabel.place(x=1000, y=20)
+
+        buttont1 = tk.Button(new_page, text="Home", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0)
+        buttont1.place(x=30, y=30)
+
+        buttont2 = tk.Button(new_page, text="Movies", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0, command=lambda: display_movies_page())
+        buttont2.place(x=140, y=30)
+
+        buttont3 = tk.Button(new_page, text="TV Shows", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0,command=lambda:display_TVShows_page())
+        buttont3.place(x=240, y=30)
+
+        buttont4 = tk.Button(new_page, text="Web series", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0,command=lambda:display_Web_series_page())
+        buttont4.place(x=380, y=30)
+
+
+        back_button = tk.Button( new_page, text="Back", fg="#00A8E1", bg='black', font=("sans serif", 15, "bold"), bd=0, command=second)
+        back_button.place(x=1380, y=30)
+
+        la1=Label(new_page,text="Amazon original movies",
+                  font=('Fira Sans', 16, 'bold'),fg="white",bg='black')
+        la1.place(x=20,y=140)
+
+        image_frame = tk.Frame(scrollable_frame, bg='black', height=200, width=1600)
+        image_frame.place(x=0, y=200)
+
+        image_paths = ["C:\\Users\\hp\\Documents\\Python Assignment\\Kalki movie.jpg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\Malai pidikatha.jpeg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\Rayan.jpeg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\Maidaan image.jpg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\champion.jpg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\Rings of power.webp",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\bbc.jpg"]
+                   
+        images = []
+        for img_path in image_paths:
+            img = Image.open(img_path)
+            img = img.resize((350, 250))  # Resize images as needed
+            img_obj = ImageTk.PhotoImage(img)
+            images.append(img_obj)
+
+# Initialize the horizontal offset and define spacing between images
+        offset = 0
+        spacing = 20  # Add 20 pixels of space between each image
+ 
+
+   
+    # Function to update the image positions
+        def update_image_positions():
+            for widget in image_frame.winfo_children():
+                widget.destroy()
+            for index, image in enumerate(images):
+                img_label = tk.Label(image_frame, image=image, bg='lightblue')
+                img_label.image = image  # Keep a reference to avoid garbage collection
+                img_label.place(x=offset + index *(350 + spacing), y=10)
+
+    # Initial display of images
+        update_image_positions()
+##
+    # Function to scroll images to the right
+        def scroll_right():
+            nonlocal offset
+            max_offset = -(len(images)) * 160  # Dynamically calculate max scrollable offset
+            if offset > max_offset:
+                offset -= 160  # Adjust scroll amount with spacing
+                update_image_positions()
+       
+    # Function to scroll images to the left
+        def scroll_left():
+            nonlocal offset
+            if offset < 0:  # Prevent scrolling past first image
+                offset += 160  # Adjust scroll amount
+                update_image_positions()
+
+    # Add left arrow button
+        left_arrow = tk.Button(scrollable_frame, text="<", command=scroll_left, bg='white',fg='black', font=("sans serif", 25 ),bd=0)
+        left_arrow.place(x=10, y=280)
+
+    # Add right arrow button
+        right_arrow = tk.Button(scrollable_frame, text=">", command=scroll_right, bg='white',fg='black', font=("sans serif", 25),bd=0)
+        right_arrow.place(x=1480, y=280)
+
+        la1=Label(new_page,text="Amazon original Web series",
+              font=('Fira Sans', 16, 'bold'),fg="white",bg='black')
+        la1.place(x=20,y=450)
+
+        image_frame2 = tk.Frame(scrollable_frame, bg='black', height=200, width=1600,bd=0)
+        image_frame2.place(x=0, y=520)
+
+        image_path2 = ["heart beat.jpeg",
+                       "november story thriller.jpeg",
+                       "Thalaimai blockbuster.jpg",
+                       "thalai blockbuster image.jpg",
+                       "vilangu series.jpeg",
+                       "bench life.jpg",
+                       "farzi.jpeg"]
+                   
+        images2 = []
+        for img_path in image_path2:
+            img = Image.open(img_path)
+            img = img.resize((350, 250))  # Resize images as needed
+            img_obj = ImageTk.PhotoImage(img)
+            images2.append(img_obj)
+    
+# Initialize the horizontal offset and define spacing between images
+        offset2 = 0
+        spacing = 20  # Add 20 pixels of space between each image
+        def update_image_positions2():
+            for widget in  image_frame2.winfo_children():
+                widget.destroy()
+            for index, image in enumerate(images2):
+                img_label = tk.Label( image_frame2, image=image, bg='black')
+                img_label.image = image
+                img_label.place(x=offset2 + index * (350 + spacing), y=10)
+
+        update_image_positions2()
+
+# Function to scroll right
+        def scroll_right2():
+            nonlocal offset2
+            max_offset = -(len(images2)) * 160
+            if offset2 > max_offset:
+                offset2 -= 160
+                update_image_positions2()
+
+# Function to scroll left+
+        def scroll_left2():
+            nonlocal offset2
+            if offset2 < 0:
+                offset2 += 160
+                update_image_positions2()
+
+# Add left arrow button for the second image frame
+        left_arrow2 = tk.Button(scrollable_frame, text="<", command=scroll_left2, bg='white', fg='black', font=("sans serif", 25), bd=0)
+        left_arrow2.place(x=10, y=580)
+
+# Add right arrow button for the second image frame
+        right_arrow2 = tk.Button(scrollable_frame, text=">", command=scroll_right2, bg='white', fg='black', font=("sans serif", 25), bd=0)
+        right_arrow2.place(x=1480, y=580)  # Adjust x position as needed
+
+#
+        la2=Label(new_page,text="Amazon Original TV shows",
+                  font=('Fira Sans', 16, 'bold'),fg="white",bg='black')
+        la2.place(x=20,y=780)
+
+        image_frame3 = tk.Frame(scrollable_frame, bg='black', height=400, width=1600,bd=0)
+        image_frame3.place(x=0, y=830)
+
+        image_path3 = ["C:\\Users\\hp\\Documents\\Python Assignment\\breath into the shadow.jpeg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\Bambai meri.jpeg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\family man.jpeg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\jubliee.jpg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\mumbai dairies.jpg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\poacher.jpg",
+                       "C:\\Users\\hp\\Documents\\Python Assignment\\The viilage.jpg"]
+                   
+##    images2 =  [ImageTk.PhotoImage(Image.open(img).resize((350, 250)))
+##                for img in image_path2]
+                   
+        images3 = []
+        for img_path in image_path3:
+            img = Image.open(img_path)
+            img = img.resize((350, 250))  # Resize images as needed
+            img_obj = ImageTk.PhotoImage(img)
+            images3.append(img_obj)
+    
+# Initialize the horizontal offset and define spacing between images
+        offset3 = 0
+        spacing = 20  # Add 20 pixels of space between each image
+        def update_image_positions3():
+            for widget in  image_frame3.winfo_children():
+                widget.destroy()
+            for index, image in enumerate(images3):
+                img_label = tk.Label( image_frame3, image=image, bg='black')
+                img_label.image = image
+                img_label.place(x=offset3 + index * (350 + spacing), y=10)
+
+        update_image_positions3()
+
+# Function to scroll right
+        def scroll_right3():
+            nonlocal offset3
+            max_offset = -(len(images3)) * 160
+            if offset3 > max_offset:
+                offset3 -= 160
+                update_image_positions3()
+
+# Function to scroll left+
+        def scroll_left3():
+            nonlocal offset3
+            if offset3 < 0:
+                offset3 += 160
+                update_image_positions3()
+
+# Add left arrow button for the second image frame
+        left_arrow3 = tk.Button(scrollable_frame, text="<", command=scroll_left3, bg='white', fg='black', font=("sans serif", 25), bd=0)
+        left_arrow3.place(x=10, y=870)
+
+# Add right arrow button for the second image frame
+        right_arrow3 = tk.Button(scrollable_frame, text=">", command=scroll_right3, bg='white', fg='black', font=("sans serif", 25), bd=0)
+        right_arrow3.place(x=1480, y=870)  # Adjust x position as needed
+
+
+    display_home_page()
+
+       
+###third page
+
+def third():
+    for widget in page2.winfo_children():
+        widget.destroy()
+
+    global eb1,eb2,eb3,page3
+
+    page3=Frame(page2,bg='black',height=1000,width=600)
+    page3.pack(fill=X)
+
+    lab1=Label(page3,text="Registered",
+               font=('Fira Sans', 25, 'bold'),fg="#00A8E1",bg='black')
+    lab1.place(x=970,y=70)
+
+    lab1=Label(page3,text="candidates ",
+               font=('Fira Sans', 25, 'bold'),fg="white",bg='black')
+    lab1.place(x=1150,y=70)
+
+    lab2=Label(page3,text="Username ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    lab2.place(x=995,y=150)
+
+    eb1=Entry (page3,font=('century gothic', 15, 'bold'))
+    eb1.place(x=995,y=190,width=250)
+
+    labe3=Label(page3,text="Phone number ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    labe3.place(x=995,y=250)
+
+    eb2=Entry(page3,font=('century gothic', 15, 'bold'))
+    eb2.place(x=995,y=295,width=250)
+
+    labe4=Label(page3,text="Password ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    labe4.place(x=995,y=330)
+
+    eb3= Entry(page3,show="*",font=('century gothic', 15, 'bold'))
+    eb3.place(x=995,y=380,width=250)
+    
+    
+    b1 = Button(page3,text="Login",command=lambda:(validate_login(),fifth()),
+                bg="#00A8E1",fg="white",font=("Consolas", 13, "bold"),height="1",width="13",bd=0)
+    b1.place(x=1050, y=460)
+
+    
+    lab5=Label(page3,text="New to Amazon? ",
+           font=('century gothic', 15, 'bold'),fg="white",bg='black')
+    lab5.place(x=970,y=530)
+
+    b1 = Button(page3,text='Create new account',command=fourth,bg="black",fg="white",
+            font=("Consolas", 13, "bold"),height="1",width="25",bd=0)
+    b1.place(x=1150, y=530)
+
+    img=Image.open("blue.jpg")
+    img=img.resize((800,800))
+    img2=ImageTk.PhotoImage(img)
+    imglabel=Button(page3,image=img2,bg="black",bd=0)
+    imglabel.image=img2
+    imglabel.place(x=0,y=0)
+
+
+def second():
+    for widget in top.winfo_children():
+        widget.destroy()
+
+    global button3,button4,page2
+    
+    page2=Frame(top,bg='black',height=1000,width=600)
+    page2.pack(fill=X)
+
+    img=Image.open("Prime.jpeg")
+    img=img.resize((390,100))
+    img2=ImageTk.PhotoImage(img)
+    imglabel=Label(page2,image=img2,bg="black",bd=0)
+    imglabel.image=img2
+    imglabel.place(x=130,y=20)
+
+
+   
+    labe1=Label(page2,text="Welcome to Prime Video ",
+           font=('sans-serif', 30, 'bold'),fg="white",bg='black')
+    labe1.place(x=60,y=240)
+
+
+    labe2=Label(page2,text="Join Prime to watch the latest movies, TV shows and award-winning  ",
+           font=('Arial', 18),fg="white",bg='black')
+    labe2.place(x=60,y=330)
+
+    labe2=Label(page2,text=" Amazon Originals  ",
+           font=('Arial', 18),fg="white",bg='black')
+    labe2.place(x=50,y=370)
+
+    buttont4=tk.Button(page2,text="sign in to join prime",command=third,fg="white",bg='#00A8E1',
+                        font=("Arial", 15, "bold"),bd=0,highlightthickness=0)
+    buttont4.place(x=190, y=470)
+
+    buttont3=tk.Button(page2,text="Join prime",command=third,fg="white",bg='#00A8E1',
+                        font=("Arial", 15, "bold"),bd=0,highlightthickness=0)
+    buttont3.place(x=1300, y=30)
+
+
+    img=Image.open("C:\\Users\\hp\\Documents\\Python Assignment\\coll.jpeg")
+    img=img.resize((900,800))
+    img2=ImageTk.PhotoImage(img)
+    imglabel=Label(page2,image=img2,bg="black",bd=0,highlightthickness=0)
+    imglabel.image=img2
+    imglabel.place(x=800,y=100)
+
+
+##first page
+L1 = Label(top,text='amazonprime',
+           font=("Fira Sans", 50, "bold"),bg="black",fg="#00A8E1",)
+L1.place(x=550, y=250)
+
+
+img=Image.open("C:\\Users\\hp\\Pictures\\smile.png")
+photo=ImageTk.PhotoImage(img)
+L1=Label(top,image=photo,bg="black")
+L1.place(x=600,y=350)
+
+
+b6 = Button(top,text='sign in',command=second,
+            fg="#00A8E1",bg='black',font=("Consolas", 25, "bold"),bd=0)
+b6.place(x=1300, y=700)
+
+
+
+top.mainloop()
